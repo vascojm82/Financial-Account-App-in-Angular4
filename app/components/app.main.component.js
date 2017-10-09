@@ -43,34 +43,30 @@ var MainComponent = (function () {
     };
     MainComponent.prototype.sortWith = function (sortMode) {
         this.sort = sortMode;
-        var leftBoxHeading = (document.querySelector(".left-box-heading")); //Casting to HTMLElement to use .style property
-        var rightBoxHeading = (document.querySelector(".right-box-heading"));
         var caret = document.querySelector('#caret');
         var caret2 = document.querySelector('#caret2');
         if (this.sort === "id") {
+            $(".left-box-heading").addClass("selected");
+            $(".right-box-heading").removeClass("selected");
             if (caret.classList.contains('hide-caret')) {
                 caret.classList.remove("hide-caret");
                 caret2.classList.add("hide-caret");
             }
             this.order[1] = this.order[0] = !this.order[1];
-            rightBoxHeading.style.backgroundColor = "#F7F7F7";
-            leftBoxHeading.style.backgroundColor = "#EFEFEF";
             caret.classList.toggle('glyphicon-triangle-top');
             caret.classList.toggle('glyphicon-triangle-bottom');
         }
         else if (this.sort === "cash_onhand") {
+            $(".left-box-heading").removeClass("selected");
+            $(".right-box-heading").addClass("selected");
             if (caret2.classList.contains('hide-caret')) {
                 caret2.classList.remove("hide-caret");
                 caret.classList.add("hide-caret");
             }
             this.order[2] = this.order[0] = !this.order[2];
-            rightBoxHeading.style.backgroundColor = "#EFEFEF";
-            leftBoxHeading.style.backgroundColor = "#F7F7F7";
             caret2.classList.toggle('glyphicon-triangle-top');
             caret2.classList.toggle('glyphicon-triangle-bottom');
         }
-        console.log("Left Box Heading Background Color: " + leftBoxHeading.style.backgroundColor);
-        console.log("Right Box Heading Background Color: " + rightBoxHeading.style.backgroundColor);
     };
     MainComponent.prototype.toggle_btn_expand = function () {
         console.log("List Done: " + this.listDone);
