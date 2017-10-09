@@ -33,7 +33,9 @@ export class MainComponent {
     }
 
     sortWith(sortMode: string): void{
-      this.sort = sortMode;
+       this.sort = sortMode;
+       let leftBoxHeading = (<HTMLElement>(document.querySelector(".left-box-heading")));    //Casting to HTMLElement to use .style property
+       let rightBoxHeading = (<HTMLElement>(document.querySelector(".right-box-heading")));
        let caret = document.querySelector('#caret');
        let caret2 = document.querySelector('#caret2');
 
@@ -44,9 +46,11 @@ export class MainComponent {
              caret2.classList.add("hide-caret");
            }
 
-           this.order[1] = this.order[0] = !this.order[1];
-           caret.classList.toggle('glyphicon-triangle-top');
-           caret.classList.toggle('glyphicon-triangle-bottom');
+        this.order[1] = this.order[0] = !this.order[1];
+        rightBoxHeading.style.backgroundColor = "#F7F7F7";
+        leftBoxHeading.style.backgroundColor = "#EFEFEF";
+        caret.classList.toggle('glyphicon-triangle-top');
+        caret.classList.toggle('glyphicon-triangle-bottom');
        }
        else if(this.sort === "cash_onhand"){
            if(caret2.classList.contains('hide-caret'))
@@ -55,9 +59,11 @@ export class MainComponent {
                caret.classList.add("hide-caret");
              }
 
-           this.order[2] = this.order[0] = !this.order[2];
-           caret2.classList.toggle('glyphicon-triangle-top');
-           caret2.classList.toggle('glyphicon-triangle-bottom');
+        this.order[2] = this.order[0] = !this.order[2];
+        rightBoxHeading.style.backgroundColor = "#EFEFEF";
+        leftBoxHeading.style.backgroundColor = "#F7F7F7";
+        caret2.classList.toggle('glyphicon-triangle-top');
+        caret2.classList.toggle('glyphicon-triangle-bottom');
        }
     }
 
