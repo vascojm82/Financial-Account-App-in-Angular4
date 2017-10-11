@@ -47,8 +47,8 @@ export class MainComponent {
            }
 
             this.order[1] = this.order[0] = !this.order[1];
-            caret.classList.toggle('glyphicon-triangle-top');
-            caret.classList.toggle('glyphicon-triangle-bottom');
+            caret.classList.toggle('glyphicon-menu-up');
+            caret.classList.toggle('glyphicon-menu-down');
        }
        else if(this.sort === "cash_onhand"){
            $(".left-box-heading").removeClass("selected");
@@ -60,8 +60,8 @@ export class MainComponent {
              }
 
              this.order[2] = this.order[0] = !this.order[2];
-             caret2.classList.toggle('glyphicon-triangle-top');
-             caret2.classList.toggle('glyphicon-triangle-bottom');
+             caret2.classList.toggle('glyphicon-menu-up');
+             caret2.classList.toggle('glyphicon-menu-down');
        }
     }
 

@@ -42,7 +42,7 @@ export class AccountListItemComponent {
       if(this.percDiff < 0)
         this.percColor = "red";
       if (this.percDiff > 0)
-        this.percColor = "green";
+        this.percColor = "rgb(62, 180, 96)";
       if (this.percDiff === 0)
         this.percColor = "grey";
     }
