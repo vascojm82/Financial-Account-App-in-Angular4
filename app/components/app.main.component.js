@@ -12,22 +12,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var data_service_1 = require("./../services/data.service");
 var MainComponent = (function () {
-    function MainComponent(cdr, dService) {
+    function MainComponent(cdr, dService, renderer, element) {
         var _this = this;
         this.cdr = cdr;
         this.dService = dService;
-        this.listDone = false;
+        this.renderer = renderer;
+        this.element = element;
         this.sort = 'id';
         this.order = [false, false, false];
         this.expanded = false;
+        this.caret1State = 0; //States are as follow for a caret:
+        this.caret2State = 0; //[0] = 'glyphicon-menu-up', [1] = 'glyphicon-menu-down'
         //Triggered from the directive's parent component when ngFor finishes iterating
         this.toggleListItem = function () {
-            _this.listDone = true;
-            var list = document.querySelector(".accounts-list");
-            if (!_this.expanded)
-                $('.app-line').addClass('hide-line');
-            for (var j = 0; j < _this.arrayMiddle; j++) {
-                list.getElementsByTagName("LI")[j].classList.remove('hide-line');
+            if (_this.expanded) {
+                _this.listExpandFull();
+            }
+            else if (!_this.expanded) {
+                _this.listExpandPartial();
             }
         };
         this.dService.getAccounts().then(function (results) {
@@ -43,56 +45,83 @@ var MainComponent = (function () {
     };
     MainComponent.prototype.sortWith = function (sortMode) {
         this.sort = sortMode;
-        var caret = document.querySelector('#caret');
-        var caret2 = document.querySelector('#caret2');
         if (this.sort === "id") {
-            $(".left-box-heading").addClass("selected");
-            $(".right-box-heading").removeClass("selected");
-            if (caret.classList.contains('hide-caret')) {
-                caret.classList.remove("hide-caret");
-                caret2.classList.add("hide-caret");
-            }
-            this.order[1] = this.order[0] = !this.order[1];
-            caret.classList.toggle('glyphicon-menu-up');
-            caret.classList.toggle('glyphicon-menu-down');
+            this.order[1] = this.order[0] = !this.order[1]; //Reverse list order
+            //Toggle the caret
+            if (this.caret1State < 1)
+                this.caret1State++;
+            else if (this.caret1State > 0)
+                this.caret1State--;
         }
         else if (this.sort === "cash_onhand") {
-            $(".left-box-heading").removeClass("selected");
-            $(".right-box-heading").addClass("selected");
-            if (caret2.classList.contains('hide-caret')) {
-                caret2.classList.remove("hide-caret");
-                caret.classList.add("hide-caret");
-            }
-            this.order[2] = this.order[0] = !this.order[2];
-            caret2.classList.toggle('glyphicon-menu-up');
-            caret2.classList.toggle('glyphicon-menu-down');
+            this.order[2] = this.order[0] = !this.order[2]; //Reverse list order
+            //Toggle the caret
+            if (this.caret2State < 1)
+                this.caret2State++;
+            else if (this.caret2State > 0)
+                this.caret2State--;
         }
     };
-    MainComponent.prototype.toggle_btn_expand = function () {
-        console.log("List Done: " + this.listDone);
-        return this.listDone;
+    MainComponent.prototype.getCSSCaret1 = function () {
+        var cssClasses;
+        cssClasses = {
+            'glyphicon': true,
+            'hide-caret': (this.sort === "id") ? false : true,
+            'arrow': true,
+            'left-arrow': true,
+            'glyphicon-menu-up': (this.caret1State < 1) ? true : false,
+            'glyphicon-menu-down': (this.caret1State > 0) ? true : false
+        };
+        return cssClasses;
     };
-    MainComponent.prototype.toggle_btn_collapse = function () {
-        return this.expanded;
+    MainComponent.prototype.getCSSCaret2 = function () {
+        var cssClasses;
+        cssClasses = {
+            'glyphicon': true,
+            'hide-caret': (this.sort === "cash_onhand") ? false : true,
+            'arrow': true,
+            'right-arrow': true,
+            'glyphicon-menu-up': (this.caret2State < 1) ? true : false,
+            'glyphicon-menu-down': (this.caret2State > 0) ? true : false
+        };
+        return cssClasses;
     };
     MainComponent.prototype.expand = function () {
-        $('.app-line').removeClass('hide-line');
-        $('#expand-btn').addClass('hide-line');
         this.expanded = true;
+        this.toggleListItem();
     };
     MainComponent.prototype.collapse = function () {
-        $('#collapse-btn').addClass('hide-line');
-        $('#expand-btn').removeClass('hide-line');
         this.expanded = false;
         this.toggleListItem();
     };
+    MainComponent.prototype.listExpandFull = function () {
+        for (var i = 0; i < this.sizeOfArray; i++) {
+            this.renderer.setElementClass(this.tref.nativeElement.getElementsByTagName("LI")[i], "hide-line", false);
+        }
+    };
+    MainComponent.prototype.listExpandPartial = function () {
+        this.listHideFull(); //Setting all list items to hidden, if this doesn't get done will get more items visible than supposed to.
+        //Unhidding only half the items
+        for (var j = 0; j < this.arrayMiddle; j++) {
+            this.renderer.setElementClass(this.tref.nativeElement.getElementsByTagName("LI")[j], "hide-line", false);
+        }
+    };
+    MainComponent.prototype.listHideFull = function () {
+        for (var k = 0; k < this.sizeOfArray; k++) {
+            this.renderer.setElementClass(this.tref.nativeElement.getElementsByTagName("LI")[k], "hide-line", true);
+        }
+    };
     return MainComponent;
 }());
+__decorate([
+    core_1.ViewChild("tref", { read: core_1.ElementRef }),
+    __metadata("design:type", core_1.ElementRef)
+], MainComponent.prototype, "tref", void 0);
 MainComponent = __decorate([
     core_1.Component({
         selector: 'app-main',
         templateUrl: './app/Views/app.view.html'
     }),
-    __metadata("design:paramtypes", [core_1.ChangeDetectorRef, data_service_1.DataService])
+    __metadata("design:paramtypes", [core_1.ChangeDetectorRef, data_service_1.DataService, core_1.Renderer, core_1.ElementRef])
 ], MainComponent);
 exports.MainComponent = MainComponent;

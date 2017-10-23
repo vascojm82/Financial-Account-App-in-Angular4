@@ -44,11 +44,6 @@ var DataService = (function () {
                 "id": "IRA - 5200",
                 "cash_onhand": 5763.36,
                 "cash_yesterday": 8916.69
-            },
-            {
-                "id": "DFA - 9010",
-                "cash_onhand": 0,
-                "cash_yesterday": 0
             }
         ];
         console.log('Data service connected...');

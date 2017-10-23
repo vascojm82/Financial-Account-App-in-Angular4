@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, Input, Output, EventEmitter   } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild, Input, Output, EventEmitter, ElementRef, Renderer } from '@angular/core';
 import { DataService } from './../services/data.service';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { RouterModule, Routes }  from '@angular/router';
@@ -13,12 +13,15 @@ export class MainComponent {
     accounts: any;
     arrayMiddle: number;
     sizeOfArray: number;
-    listDone: boolean = false;
     sort: string = 'id';
     order: boolean [] =  [false, false, false];
     expanded: boolean = false;
+    caret1State: number = 0;    //States are as follow for a caret:
+    caret2State: number = 0;    //[0] = 'glyphicon-menu-up', [1] = 'glyphicon-menu-down'
 
-    constructor(private cdr: ChangeDetectorRef, private dService: DataService) {
+    @ViewChild("tref", {read: ElementRef}) tref: ElementRef;    //Template Reference to accounts list UL
+
+    constructor(private cdr: ChangeDetectorRef, private dService: DataService, private renderer : Renderer, private element : ElementRef) {
         this.dService.getAccounts().then((results: any) => {
           this.accounts = results;
         }).catch((error) => console.log(error));
@@ -34,70 +37,94 @@ export class MainComponent {
 
     sortWith(sortMode: string): void{
        this.sort = sortMode;
-       let caret = document.querySelector('#caret');
-       let caret2 = document.querySelector('#caret2');
 
        if(this.sort === "id"){
-           $(".left-box-heading").addClass("selected");
-           $(".right-box-heading").removeClass("selected");
-           if(caret.classList.contains('hide-caret'))
-           {
-             caret.classList.remove("hide-caret");
-             caret2.classList.add("hide-caret");
-           }
+         this.order[1] = this.order[0] = !this.order[1];      //Reverse list order
 
-            this.order[1] = this.order[0] = !this.order[1];
-            caret.classList.toggle('glyphicon-menu-up');
-            caret.classList.toggle('glyphicon-menu-down');
+         //Toggle the caret
+         if(this.caret1State < 1)
+          this.caret1State++;
+         else if(this.caret1State > 0)
+          this.caret1State--;
        }
        else if(this.sort === "cash_onhand"){
-           $(".left-box-heading").removeClass("selected");
-           $(".right-box-heading").addClass("selected");
-           if(caret2.classList.contains('hide-caret'))
-             {
-               caret2.classList.remove("hide-caret");
-               caret.classList.add("hide-caret");
-             }
+         this.order[2] = this.order[0] = !this.order[2];      //Reverse list order
 
-             this.order[2] = this.order[0] = !this.order[2];
-             caret2.classList.toggle('glyphicon-menu-up');
-             caret2.classList.toggle('glyphicon-menu-down');
+         //Toggle the caret
+         if(this.caret2State < 1)
+          this.caret2State++;
+         else if(this.caret2State > 0)
+          this.caret2State--;
        }
     }
+
+    getCSSCaret1(): any{
+      let cssClasses;
+
+      cssClasses = {
+        'glyphicon': true,
+        'hide-caret': (this.sort === "id") ? false : true,
+        'arrow': true,
+        'left-arrow': true,
+        'glyphicon-menu-up': (this.caret1State < 1) ? true : false,
+        'glyphicon-menu-down': (this.caret1State > 0) ? true : false
+      }
+
+      return cssClasses;
+    }
+
+    getCSSCaret2(): any{
+        let cssClasses;
+
+        cssClasses = {
+          'glyphicon': true,
+          'hide-caret': (this.sort === "cash_onhand") ? false : true,
+          'arrow': true,
+          'right-arrow': true,
+          'glyphicon-menu-up': (this.caret2State < 1) ? true : false,
+          'glyphicon-menu-down': (this.caret2State > 0) ? true : false
+        }
+
+        return cssClasses;
+     }
 
     //Triggered from the directive's parent component when ngFor finishes iterating
     public toggleListItem = () => {       //ES6 style arrow function, So that it preserves the context of the Component instead of the Directive
-        this.listDone = true;
-        var list: any = document.querySelector(".accounts-list");
-
-        if(!this.expanded)
-          $('.app-line').addClass('hide-line');
-
-        for(var j: number = 0; j < this.arrayMiddle; j++)
-        {
-            list.getElementsByTagName("LI")[j].classList.remove('hide-line');
-        }
-    }
-
-    toggle_btn_expand(){
-      console.log("List Done: " + this.listDone);
-      return this.listDone;
-    }
-
-    toggle_btn_collapse(){
-      return this.expanded;
+      if(this.expanded){
+          this.listExpandFull();
+      }else if(!this.expanded){
+          this.listExpandPartial();
+      }
     }
 
     expand(){
-      $('.app-line').removeClass('hide-line');
-      $('#expand-btn').addClass('hide-line');
       this.expanded = true;
+      this.toggleListItem();
     }
 
     collapse(){
-      $('#collapse-btn').addClass('hide-line');
-      $('#expand-btn').removeClass('hide-line');
       this.expanded = false;
       this.toggleListItem();
+    }
+
+    listExpandFull(){
+      for(var i: number = 0; i< this.sizeOfArray; i++){
+        this.renderer.setElementClass(this.tref.nativeElement.getElementsByTagName("LI")[i], "hide-line", false);
+      }
+    }
+
+    listExpandPartial(){
+      this.listHideFull();    //Setting all list items to hidden, if this doesn't get done will get more items visible than supposed to.
+
+      //Unhidding only half the items
+      for(var j: number = 0; j < this.arrayMiddle; j++){
+        this.renderer.setElementClass(this.tref.nativeElement.getElementsByTagName("LI")[j], "hide-line", false);
+      }
+    }
+
+    listHideFull(){
+      for(var k = 0; k< this.sizeOfArray; k++){
+        this.renderer.setElementClass(this.tref.nativeElement.getElementsByTagName("LI")[k], "hide-line", true);
+      }
     }
 }

@@ -1,22 +1,22 @@
 <div class="container">
     <div class="row header-container border-bottom-darker">
         <div class="header-line">
-            <div class="left-box-heading topBar selected" (click)="sortWith('id')">
-                  <h4>Account <span id="caret" class="glyphicon glyphicon-menu-up arrow left-arrow"></span></h4>
+            <div class="left-box-heading topBar" [ngClass]="(sort === 'id') ? 'selected' : ''" (click)="sortWith('id')">
+                  <h4>Account <span id="caret" [ngClass]="getCSSCaret1()"></span></h4>
             </div>
-            <div class="right-box-heading topBar" (click)="sortWith('cash_onhand')">
-                  <h4><span id="caret2" class="glyphicon glyphicon-menu-up arrow right-arrow hide-caret"></span> Available Cash</h4>
+            <div class="right-box-heading topBar" [ngClass]="(sort === 'cash_onhand') ? 'selected' : ''" (click)="sortWith('cash_onhand')">
+                  <h4><span id="caret2" [ngClass]="getCSSCaret2()"></span> Available Cash</h4>
                   <p>Today's Change</p>
             </div>
         </div>
     </div>
     <div class="row accts-container">
-        <ul class="accounts-list">
+        <ul #tref class="accounts-list">
             <li class="app-line border-bottom-light hide-line" *ngFor="let account of accounts | sortBy: sort: order[0]; let i = index; let last = last" [callback]="toggleListItem" [callback-condition]="last">
                 <account-list-item [account]="account"></account-list-item>
             </li>
         </ul>
-        <button id="expand-btn" *ngIf="toggle_btn_expand()" (click)="expand()" class="w3-button w3-black">Load more</button>
-        <button id="collapse-btn" *ngIf="toggle_btn_collapse()" (click)="collapse()" class="w3-button w3-black">Load less</button>
+        <button id="expand-btn" [ngClass]="(expanded === true) ? 'hide-line' : ''" (click)="expand()" class="w3-button w3-black">Load more</button>
+        <button id="collapse-btn" [ngClass]="(expanded === false) ? 'hide-line' : ''" (click)="collapse()" class="w3-button w3-black">Load less</button>
     </div>
 </div>
